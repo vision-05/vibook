@@ -1,9 +1,0 @@
-../Core/Src/main.c:68:6:MPR121_Init_Simple	24	static
-../Core/Src/main.c:97:6:MPR121_Read_Raw_Data	48	static
-../Core/Src/main.c:112:6:DFPlayer_Send	48	static
-../Core/Src/main.c:133:5:main	16	static
-../Core/Src/main.c:212:6:SystemClock_Config	112	static
-../Core/Src/main.c:262:13:MX_I2C1_Init	8	static
-../Core/Src/main.c:310:13:MX_USART2_UART_Init	8	static
-../Core/Src/main.c:345:13:MX_GPIO_Init	16	static
-../Core/Src/main.c:367:6:Error_Handler	8	static,ignoring_inline_asm

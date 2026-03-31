@@ -38,3 +38,19 @@ fp-info-cache
 
 # Local project settings
 *.kicad_prl
+
+Debug/
+Release/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+*.su
+
+.mxproject
+*.bak
+*.tmp
+
+.DS_Store
+Thumbs.db
