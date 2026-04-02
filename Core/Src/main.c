@@ -62,7 +62,12 @@ static void MX_USART2_UART_Init(void);
 uint8_t found_addresses[10];
 uint8_t device_count = 0;
 
-#define MPR121_ADDR (0x5A << 1) // U1's address shifted for STM32 HAL
+volatile uint8_t touch_event_detected = 0;
+uint16_t chip1_touched = 0;
+uint16_t chip2_touched = 0;
+
+#define MPR121_ADDR1 (0x5A << 1) // U1's address shifted for STM32 HAL
+#define MPR121_ADDR2 (0x5C << 1)
 volatile uint16_t current_touches = 0;
 
 void MPR121_Init_Simple(void) {
@@ -70,43 +75,66 @@ void MPR121_Init_Simple(void) {
 
     // 1. Soft Reset
     config_data[0] = 0x80; config_data[1] = 0x63;
-    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR, config_data, 2, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR1, config_data, 2, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR2, config_data, 2, 100);
     HAL_Delay(10);
 
     // 2. Set touch and release thresholds for all electrodes (approximate values)
     for (uint8_t i = 0x41; i < 0x5A; i+=2) {
         config_data[0] = i;     // Touch Threshold Register
         config_data[1] = 12;    // Touch Value (Lower = more sensitive)
-        HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR, config_data, 2, 100);
+        HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR1, config_data, 2, 100);
+        HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR2, config_data, 2, 100);
+
 
         config_data[0] = i + 1; // Release Threshold Register
         config_data[1] = 6;     // Release Value
-        HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR, config_data, 2, 100);
+        HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR1, config_data, 2, 100);
+        HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR2, config_data, 2, 100);
+
     }
 
     // 3. Turn on all 12 electrodes and enter "Run Mode"
     config_data[0] = 0x5E; config_data[1] = 0x0C;
-    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR, config_data, 2, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR1, config_data, 2, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR2, config_data, 2, 100);
+
 }
 
-volatile uint16_t raw_electrode_data[12] = {0};
+volatile uint16_t raw_electrode_data[24] = {0};
 
 // Keep your MPR121_Init_Simple() function exactly as it is!
 
 // Replace MPR121_Read_Touches with this:
 void MPR121_Read_Raw_Data(void) {
     uint8_t reg = 0x04; // Start at the first raw data register
-    uint8_t data[24];   // 12 electrodes * 2 bytes each = 24 bytes
+    uint8_t data[48];   // 12 electrodes * 2 bytes each = 24 bytes
 
     // Ask for 24 bytes starting at register 0x04
-    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR, &reg, 1, 100);
-    HAL_I2C_Master_Receive(&hi2c1, MPR121_ADDR, data, 24, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR1, &reg, 1, 100);
+    HAL_I2C_Master_Receive(&hi2c1, MPR121_ADDR1, data, 24, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR2, &reg, 1, 100);
+    HAL_I2C_Master_Receive(&hi2c1, MPR121_ADDR2, &data[24], 24, 100);
 
     // The MPR121 sends the Least Significant Byte (LSB) first, then the MSB.
     // We combine them into our 16-bit array.
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 24; i++) {
         raw_electrode_data[i] = ((uint16_t)data[(i*2) + 1] << 8) | data[(i*2)];
     }
+}
+
+void MPR121_Read_Touch_Status(void) {
+	uint8_t reg = 0x00;
+	uint8_t status_data[2];
+
+	HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR1, &reg, 1, 100);
+	HAL_I2C_Master_Receive(&hi2c1, MPR121_ADDR1, status_data, 2, 100);
+	chip1_touched = ((uint16_t)status_data[1] << 8) | status_data[0];
+
+	HAL_I2C_Master_Transmit(&hi2c1, MPR121_ADDR2, &reg, 1, 100);
+	HAL_I2C_Master_Receive(&hi2c1, MPR121_ADDR2, status_data, 2, 100);
+    chip2_touched = ((uint16_t)status_data[1] << 8) | status_data[0];
+
 }
 
 void DFPlayer_Send(uint8_t source, uint8_t command, uint8_t dat1, uint8_t dat2) {
@@ -159,49 +187,35 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  /* USER CODE BEGIN 2 */
   MPR121_Init_Simple();
     HAL_Delay(500); // Give DFPlayer time to wake up
 
     // Set initial volume (0x00 to 0x1E / 30)
-    DFPlayer_Send(0, 0x06, 0, 15);
+    DFPlayer_Send(0, 0x06, 0, 30);
 
     uint16_t last_touches = 0; // To prevent re-triggering
-    /* USER CODE END 2 */
-
-    while (1)
-    {
-        MPR121_Read_Raw_Data();
-
-        // TRIGGER PLAY: Only if finger IS down AND flag is 0
-        if (raw_electrode_data[6] < 200 && !(last_touches & 0x01))
-        {
-            // 1. Force a Stop first to clear the buffer
-            DFPlayer_Send(0, 0x16, 0, 0);
-            HAL_Delay(50); // Give the UART a moment to breathe
-
-            // 2. Send the Play command
-            DFPlayer_Send(0, 0x03, 0, 1);
-
-            last_touches |= 0x01; // Set the flag so we don't spam "Play"
-        }
-
-        // TRIGGER RESET: Only if finger IS UP AND flag is 1
-        else if (raw_electrode_data[6] > 250 && (last_touches & 0x01))
-        {
-            // Tell the player to stop
-            DFPlayer_Send(0, 0x16, 0, 0);
-
-            // CRITICAL: Clear the flag so the 'if' block can run again!
-            last_touches &= ~0x01;
-        }
-
-        HAL_Delay(50);
-    }
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+	if(touch_event_detected == 1) {
+		touch_event_detected = 0;
+		MPR121_Read_Touch_Status();
+
+		if(chip1_touched != 0) {
+			DFPlayer_Send(0, 0x16, 0x00, 0x00);
+		}
+		if(chip2_touched != 0) {
+			DFPlayer_Send(0, 0x01, 0x00, 0x00);
+		}
+	}
+
+  }
   /* USER CODE END 3 */
 }
 
@@ -344,6 +358,7 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
@@ -351,12 +366,28 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
+  /*Configure GPIO pin : PA5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if(GPIO_Pin == GPIO_PIN_5) {
+		touch_event_detected = 1;
+	}
+}
 
 /* USER CODE END 4 */
 
