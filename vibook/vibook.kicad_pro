@@ -800,7 +800,7 @@
         "uuid": "777d8e9d-aa9e-4124-99ce-98f806fd10f6"
       }
     ],
-    "used_designators": "",
+    "used_designators": "U1,U4,U8,U10,#PWR19-26,R31",
     "variants": []
   },
   "sheets": [
