@@ -1,0 +1,4 @@
+(version 1)
+(rule "Relax clearance in fan-out zones"
+  (condition "A.insideArea('mpr1_fan') || A.insideArea('mpr2_fan')")
+  (constraint clearance (min 0.1mm)))

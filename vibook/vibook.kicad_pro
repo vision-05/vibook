@@ -50,7 +50,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.25
+          "min_clearance": 1.2
         }
       },
       "diff_pair_dimensions": [
@@ -143,7 +143,7 @@
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
         "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.2,
+        "min_track_width": 0.1,
         "min_via_annular_width": 0.1,
         "min_via_diameter": 0.5,
         "solder_mask_to_copper_clearance": 0.0,
@@ -514,12 +514,23 @@
         "clearance": 0.2,
         "name": "BatVin",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
-        "priority": 0,
+        "priority": 1,
         "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.4,
         "tuning_profile": "",
         "via_diameter": 0.8,
         "via_drill": 0.4
+      },
+      {
+        "clearance": 0.3,
+        "name": "ELE",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "priority": 0,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.13,
+        "tuning_profile": "",
+        "via_diameter": 0.6,
+        "via_drill": 0.3
       }
     ],
     "meta": {
@@ -531,6 +542,22 @@
       {
         "netclass": "BatVin",
         "pattern": "+4.5V"
+      },
+      {
+        "netclass": "ELE",
+        "pattern": "/ELE*"
+      },
+      {
+        "netclass": "ELE",
+        "pattern": "/TSC*"
+      },
+      {
+        "netclass": "ELE",
+        "pattern": "Net-(U3-LED*"
+      },
+      {
+        "netclass": "ELE",
+        "pattern": "Net-(U3-ELE*"
       }
     ]
   },
@@ -800,7 +827,7 @@
         "uuid": "777d8e9d-aa9e-4124-99ce-98f806fd10f6"
       }
     ],
-    "used_designators": "J4-5,#PWR18,#PWR27-29,U1,U4",
+    "used_designators": "SW1,#PWR32,R48,U2",
     "variants": []
   },
   "sheets": [
