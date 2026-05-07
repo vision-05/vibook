@@ -522,7 +522,7 @@
         "via_drill": 0.4
       },
       {
-        "clearance": 0.3,
+        "clearance": 0.2,
         "name": "ELE",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": 0,
@@ -557,7 +557,7 @@
       },
       {
         "netclass": "ELE",
-        "pattern": "Net-(U3-ELE*"
+        "pattern": "/TSC_G*"
       }
     ]
   },
@@ -566,7 +566,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "./",
+      "plot": "vibook-gbr/",
       "pos_files": "./",
       "specctra_dsn": "",
       "step": "",
@@ -827,7 +827,7 @@
         "uuid": "777d8e9d-aa9e-4124-99ce-98f806fd10f6"
       }
     ],
-    "used_designators": "SW1,#PWR32,R48,U2",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
