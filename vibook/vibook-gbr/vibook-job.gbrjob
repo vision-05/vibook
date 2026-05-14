@@ -3,9 +3,9 @@
     "GenerationSoftware": {
       "Vendor": "KiCad",
       "Application": "Pcbnew",
-      "Version": "9.0.3"
+      "Version": "10.0.0"
     },
-    "CreationDate": "2026-03-01T17:04:38+00:00"
+    "CreationDate": "2026-05-07T03:09:36+01:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
@@ -14,8 +14,8 @@
       "Revision": "rev?"
     },
     "Size": {
-      "X": 25.05,
-      "Y": 115.05
+      "X": 123.5344,
+      "Y": 21.3156
     },
     "LayerNumber": 2,
     "BoardThickness": 1.6,
@@ -24,57 +24,57 @@
   "DesignRules": [
     {
       "Layers": "Outer",
-      "PadToPad": 0.15,
-      "PadToTrack": 0.15,
+      "PadToPad": 0.1,
+      "PadToTrack": 0.1,
       "TrackToTrack": 0.15,
-      "MinLineWidth": 0.2,
-      "TrackToRegion": 0.5,
-      "RegionToRegion": 0.5
+      "MinLineWidth": 0.13,
+      "TrackToRegion": 0.25,
+      "RegionToRegion": 0.25
     }
   ],
   "FilesAttributes": [
     {
-      "Path": "vibook-F_Cu.gbr",
+      "Path": "vibook-F_Cu.gtl",
       "FileFunction": "Copper,L1,Top",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "vibook-B_Cu.gbr",
+      "Path": "vibook-B_Cu.gbl",
       "FileFunction": "Copper,L2,Bot",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "vibook-F_Paste.gbr",
+      "Path": "vibook-F_Paste.gtp",
       "FileFunction": "SolderPaste,Top",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "vibook-B_Paste.gbr",
+      "Path": "vibook-B_Paste.gbp",
       "FileFunction": "SolderPaste,Bot",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "vibook-F_Silkscreen.gbr",
+      "Path": "vibook-F_Silkscreen.gto",
       "FileFunction": "Legend,Top",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "vibook-B_Silkscreen.gbr",
+      "Path": "vibook-B_Silkscreen.gbo",
       "FileFunction": "Legend,Bot",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "vibook-F_Mask.gbr",
+      "Path": "vibook-F_Mask.gts",
       "FileFunction": "SolderMask,Top",
       "FilePolarity": "Negative"
     },
     {
-      "Path": "vibook-B_Mask.gbr",
+      "Path": "vibook-B_Mask.gbs",
       "FileFunction": "SolderMask,Bot",
       "FilePolarity": "Negative"
     },
     {
-      "Path": "vibook-Edge_Cuts.gbr",
+      "Path": "vibook-Edge_Cuts.gm1",
       "FileFunction": "Profile",
       "FilePolarity": "Positive"
     }
