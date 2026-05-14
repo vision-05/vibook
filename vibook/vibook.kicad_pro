@@ -827,7 +827,7 @@
         "uuid": "777d8e9d-aa9e-4124-99ce-98f806fd10f6"
       }
     ],
-    "used_designators": "SW1,#PWR32,R48,U2",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [

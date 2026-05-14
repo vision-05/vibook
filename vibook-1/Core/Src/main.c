@@ -208,10 +208,21 @@ int main(void)
 		MPR121_Read_Touch_Status();
 
 		if(chip1_touched != 0) {
+			for(int i = 0; i < 12; ++i) {
+				if(chip1_touched & (1 << i)) {
+					DFPlayer_Send(0, 0x16, 0x00, 0x00);
+					DFPlayer_Send(0, 0x03, 0x00, i+1);
+				}
+			}
 			DFPlayer_Send(0, 0x16, 0x00, 0x00);
 		}
 		if(chip2_touched != 0) {
-			DFPlayer_Send(0, 0x01, 0x00, 0x00);
+			for(int i = 0; i < 12; ++i) {
+				if(chip2_touched & (1 << i)) {
+					DFPlayer_Send(0, 0x16, 0x00, 0x00);
+					DFPlayer_Send(0, 0x03, 0x00, i+12);
+				}
+			}
 		}
 	}
 
